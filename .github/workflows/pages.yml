@@ -1,0 +1,40 @@
+name: Build and Publish to gh-pages
+
+on:
+  push:
+    branches: [ pages ]   # jeśli pracujesz na innej gałęzi, zmień tu
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm install    # użyj npm ci tylko gdy masz package-lock.json i jest aktualny
+
+      - name: Build
+        run: npm run build -- --sourcemap
+
+      - name: Add SPA fallback (404.html)
+        run: cp -f dist/index.html dist/404.html || true
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          # zachowaj CNAME jeśli masz public/CNAME (Vite przeniesie go do dist)
+          keep_files: false
