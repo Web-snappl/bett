@@ -7,5 +7,9 @@ export default defineConfig({
   base: './',                       // pod własną domeną zostaje '/'
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') }
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
   }
 })
